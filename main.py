@@ -1,35 +1,40 @@
 import telebot, sqlite3, time, os
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
-from config import token
 
+# === ТОКЕН ИЗ ПЕРЕМЕННЫХ ОКРУЖЕНИЯ ===
+token = os.environ['BOT_TOKEN']  # ← ВАЖНО: ТОКЕН ТОЛЬКО ИЗ RAILWAY
 bot = telebot.TeleBot(token)
+
 DB = "barsen_final_fixed.db"
 user_progress = {}
 
-# === УДАЛЕНИЕ БД ===
-if os.path.exists(DB): os.remove(DB)
-conn = sqlite3.connect(DB); c = conn.cursor()
-c.execute('CREATE TABLE users (user_id INTEGER PRIMARY KEY, username TEXT, lvl INTEGER DEFAULT 1, exp INTEGER DEFAULT 0, quizzes INTEGER DEFAULT 0, clicks INTEGER DEFAULT 0)')
-c.execute('CREATE TABLE achievements (user_id INTEGER, ach_id TEXT, PRIMARY KEY (user_id, ach_id))')
-conn.commit(); conn.close()
+# === УДАЛЕНИЕ БД (УБЕРИ, КОГДА БУДЕШЬ УВЕРЕН) ===
+if os.path.exists(DB):
+    os.remove(DB)
+    print("Старая БД удалена — новая создаётся...")
 
-# === ПРЕДМЕТЫ ===
+conn = sqlite3.connect(DB)
+c = conn.cursor()
+c.execute('CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, username TEXT, lvl INTEGER DEFAULT 1, exp INTEGER DEFAULT 0, quizzes INTEGER DEFAULT 0, clicks INTEGER DEFAULT 0)')
+c.execute('CREATE TABLE IF NOT EXISTS achievements (user_id INTEGER, ach_id TEXT, PRIMARY KEY (user_id, ach_id))')
+conn.commit()
+conn.close()
+
+# === ПРЕДМЕТЫ, КЛИКЕР, АЧИВКИ, КВИЗЫ (всё как было) ===
 SUBJECTS = ["Математика", "Физика", "Химия", "Биология", "История", "Русский язык", "Информатика"]
 SUB_CODES = ["math","physics","chemistry","biology","history","russian","informatics"]
 
-# === КЛИКЕР УРОВНИ (МАКС 1000) ===
 CLICKER_LEVELS = [
-    {"min": 0,    "name": "Барсен-ребёнок", "desc": "Маленький Барсен"},
-    {"min": 10,   "name": "Барсен-школьник", "desc": "Учится в школе"},
-    {"min": 50,   "name": "Барсен-студент", "desc": "Готовится к ЕГЭ"},
-    {"min": 100,  "name": "Барсен-учитель", "desc": "Делится знаниями"},
-    {"min": 250,  "name": "Барсен-гений", "desc": "Решил P=NP"},
-    {"min": 500,  "name": "Барсен-бог", "desc": "Вселенная в голове"},
-    {"min": 750,  "name": "Барсен-∞", "desc": "Бесконечность"},
+    {"min": 0, "name": "Барсен-ребёнок", "desc": "Маленький Барсен"},
+    {"min": 10, "name": "Барсен-школьник", "desc": "Учится в школе"},
+    {"min": 50, "name": "Барсен-студент", "desc": "Готовится к ЕГЭ"},
+    {"min": 100, "name": "Барсен-учитель", "desc": "Делится знаниями"},
+    {"min": 250, "name": "Барсен-гений", "desc": "Решил P=NP"},
+    {"min": 500, "name": "Барсен-бог", "desc": "Вселенная в голове"},
+    {"min": 750, "name": "Барсен-∞", "desc": "Бесконечность"},
     {"min": 1000, "name": "Бездельник", "desc": "ТЫ ПРОШЁЛ КЛИКЕР!"}
 ]
 
-# === АЧИВКИ ===
 ACHIEVEMENTS = {
     "first": "Первая викторина",
     "perfect": "Идеал (5/5)",
@@ -37,7 +42,6 @@ ACHIEVEMENTS = {
     "idler": "Бездельник (1000 кликов)"
 }
 
-# === КВИЗЫ (7 × 3 × 5) — уже есть в предыдущем коде, вставь сюда ===
 QUIZ = {
     "math": {
         "easy": [
@@ -422,4 +426,11 @@ def ach(uid, msg):
 # === ЗАПУСК ===
 if __name__ == "__main__":
     print("БАРСЕН — ФИНАЛ 2.0. ВСЁ ИСПРАВЛЕНО. 1000 КЛИКОВ = ФИНАЛ.")
-    bot.infinity_polling()
+    
+    while True:
+        try:
+            print("Запускаю бота...")
+            bot.infinity_polling(none_stop=True, interval=0)
+        except Exception as e:
+            print(f"КРАШ: {e}. Перезапуск через 5 сек...")
+            time.sleep(5)
