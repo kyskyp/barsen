@@ -256,8 +256,7 @@ def start(m):
     animate(m.chat.id, "Барсен просыпается")
     bot.send_message(m.chat.id,
         "*ПОМОЩНИК БАРСЕН*\n"
-        "7 предметов • 3 уровня • 5 вопросов\n"
-        "*Пасхалка:* кликер в меню",
+        "7 предметов • 3 уровня • 5 вопросов\n",
         reply_markup=main_menu(), parse_mode='Markdown')
     bot.send_message(m.chat.id, "Выбери действие:", reply_markup=bottom_menu())
 
@@ -434,3 +433,4 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"КРАШ: {e}. Перезапуск через 5 сек...")
             time.sleep(5)
+
