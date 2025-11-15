@@ -401,11 +401,33 @@ def profile(uid, msg):
     bot.send_message(msg.chat.id, text, reply_markup=main_menu(), parse_mode='Markdown')
 
 def top(msg):
-    conn = sqlite3.connect(DB); c = conn.cursor()
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
     c.execute("SELECT username, exp FROM users ORDER BY exp DESC LIMIT 10")
-    rows = c.fetchall(); conn.close()
-    text = "*Топ-10*\n" + ("\n".join([f"{i+1}. {n} — {e} EXP" for i,(n,e) in enumerate(rows)]) or "Пусто!")
-    bot.send_message(msg.chat.id, text, reply_markup=main_menu(), parse_mode='Markdown')
+    rows = c.fetchall()
+    conn.close()
+
+    if not rows:
+        text = "*Топ-10*\nПусто!"
+    else:
+        text = "*Топ-10 игроков*:\n\n"
+        for i, (username, exp) in enumerate(rows, 1):
+            # Если username есть — делаем @username с ссылкой
+            if username and username != "None":
+                # username может быть None, если юзер скрыл ник
+                display_name = f"@{username}"
+                profile_link = f"https://t.me/{username}"
+                text += f"{i}. <a href=\"{profile_link}\">{display_name}</a> — *{exp}* EXP\n"
+            else:
+                text += f"{i}. Аноним — *{exp}* EXP\n"
+
+    bot.send_message(
+        msg.chat.id,
+        text,
+        reply_markup=main_menu(),
+        parse_mode='HTML',
+        disable_web_page_preview=True
+    )
 
 def ach(uid, msg):
     conn = sqlite3.connect(DB); c = conn.cursor()
@@ -428,5 +450,6 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"КРАШ: {e}. Перезапуск через 5 сек...")
             time.sleep(5)
+
 
 
