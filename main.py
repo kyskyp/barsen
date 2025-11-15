@@ -8,11 +8,6 @@ bot = telebot.TeleBot(token)
 DB = "barsen_final_fixed.db"
 user_progress = {}
 
-# === УДАЛЕНИЕ БД (УБЕРИ, КОГДА БУДЕШЬ УВЕРЕН) ===
-if os.path.exists(DB):
-    os.remove(DB)
-    print("Старая БД удалена — новая создаётся...")
-
 conn = sqlite3.connect(DB)
 c = conn.cursor()
 c.execute('CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, username TEXT, lvl INTEGER DEFAULT 1, exp INTEGER DEFAULT 0, quizzes INTEGER DEFAULT 0, clicks INTEGER DEFAULT 0)')
@@ -27,12 +22,12 @@ SUB_CODES = ["math","physics","chemistry","biology","history","russian","informa
 CLICKER_LEVELS = [
     {"min": 0, "name": "Барсен-ребёнок", "desc": "Маленький Барсен"},
     {"min": 10, "name": "Барсен-школьник", "desc": "Учится в школе"},
-    {"min": 50, "name": "Барсен-студент", "desc": "Готовится к ЕГЭ"},
+    {"min": 50, "name": "Барсен-студент", "desc": "Гоняет по вене"},
     {"min": 100, "name": "Барсен-учитель", "desc": "Делится знаниями"},
     {"min": 250, "name": "Барсен-гений", "desc": "Решил P=NP"},
-    {"min": 500, "name": "Барсен-бог", "desc": "Вселенная в голове"},
+    {"min": 500, "name": "Барсен-бог", "desc": "Своя вселенная"},
     {"min": 750, "name": "Барсен-∞", "desc": "Бесконечность"},
-    {"min": 1000, "name": "Бездельник", "desc": "ТЫ ПРОШЁЛ КЛИКЕР!"}
+    {"min": 1000, "name": "Бездельник", "desc": "а зачем"}
 ]
 
 ACHIEVEMENTS = {
@@ -433,4 +428,5 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"КРАШ: {e}. Перезапуск через 5 сек...")
             time.sleep(5)
+
 
